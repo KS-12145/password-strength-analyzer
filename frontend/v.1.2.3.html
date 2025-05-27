@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Password Strength Analyzer - Kaniz Sukayna</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background: url('https://images.unsplash.com/photo-1610878180933-0c8fbd3bb8de?auto=format&fit=crop&w=1950&q=80') no-repeat center center fixed;
+      background-size: cover;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 40px;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+      color: #fff;
+      max-width: 400px;
+      width: 90%;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 26px;
+      margin-bottom: 10px;
+      color:#333
+    }
+
+    .subheading {
+      font-size: 14px;
+      margin-bottom: 25px;
+      font-weight: 400;
+      color: #665757;
+    }
+
+    .password-wrapper {
+      position: relative;
+      margin-bottom: 20px;
+      color: #00cec9;
+    }
+
+    input[type="password"],
+    input[type="text"] {
+      width: 100%;
+      padding: 12px 40px 12px 12px;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      outline: none;
+    }
+
+    .toggle-password {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      font-size: 18px;
+      user-select: none;
+      color: #333;
+    }
+
+    button {
+      background: #00cec9;
+      border: none;
+      padding: 12px 20px;
+      color: #fff;
+      border-radius: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background: #0984e3;
+    }
+
+    .result {
+      margin-top: 20px;
+      color: #665757;
+    }
+
+    .strength {
+      font-weight: bold;
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+
+    .strength.weak { color: #e74c3c; }
+    .strength.medium { color: #f39c12; }
+    .strength.strong { color: #2ecc71; }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      text-align: left;
+      color: #333;
+    }
+
+    li {
+      font-size: 14px;
+      margin: 4px 0;
+    }
+
+    /* Modal Popup */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.6);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .modal-content {
+      background: white;
+      color: #333;
+      padding: 30px;
+      border-radius: 20px;
+      text-align: center;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+      animation: popup 0.3s ease-out;
+    }
+
+    @keyframes popup {
+      0% { transform: scale(0.8); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .modal-content h2 {
+      margin-bottom: 10px;
+    }
+
+    .modal-content button {
+      background: #00b894;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Password Strength Analyzer</h1>
+    <div class="subheading">Designed by Kaniz Sukayna</div>
+
+    <div class="password-wrapper">
+      <input type="password" id="password" placeholder="Enter your password" />
+      <span class="toggle-password" onclick="togglePassword()">👁️</span>
+    </div>
+
+    <button onclick="checkPassword()">Check Strength</button>
+
+    <div class="result">
+      <div id="result" class="strength"></div>
+      <ul id="suggestions"></ul>
+    </div>
+  </div>
+
+  <!-- 🎉 Modal for strong password -->
+  <div class="modal" id="popupModal">
+    <div class="modal-content">
+      <h2>🎉 Awesome!</h2>
+      <p>It's a perfect password.</p>
+      <button onclick="closeModal()">Close</button>
+    </div>
+  </div>
+
+  <!-- 🔊 Celebration sound -->
+  <audio id="celebrationSound" src="https://www.soundjay.com/human/sounds/applause-01.mp3"></audio>
+
+  <script>
+    function togglePassword() {
+      const pwField = document.getElementById("password");
+      const icon = document.querySelector(".toggle-password");
+      if (pwField.type === "password") {
+        pwField.type = "text";
+        icon.textContent = "🙈";
+      } else {
+        pwField.type = "password";
+        icon.textContent = "👁️";
+      }
+    }
+
+    function closeModal() {
+      document.getElementById("popupModal").style.display = "none";
+    }
+
+    async function checkPassword() {
+      const pw = document.getElementById("password").value;
+
+      const response = await fetch("http://192.168.189.128:5000/analyze", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ password: pw }),
+      });
+
+      if (!response.ok) {
+        document.getElementById("result").textContent = "Error checking password.";
+        document.getElementById("result").className = "strength";
+        document.getElementById("suggestions").innerHTML = "";
+        return;
+      }
+
+      const data = await response.json();
+
+      const result = document.getElementById("result");
+      result.textContent = `Strength: ${data.strength}`;
+      result.className = `strength ${data.strength.toLowerCase()}`;
+
+      const list = document.getElementById("suggestions");
+      list.innerHTML = "";
+      data.suggestions.forEach((s) => {
+        const li = document.createElement("li");
+        li.textContent = s;
+        list.appendChild(li);
+      });
+// existing functions: togglePassword, checkPassword, etc.
+
+document.getElementById("password").addEventListener("keydown", function(event) {
+  if (event.key === "Enter") {
+    event.preventDefault();
+    checkPassword();
+  }
+});
+
+      // 🎉 Show popup and play sound if strong
+      if (data.strength.toLowerCase() === "strong") {
+        document.getElementById("popupModal").style.display = "flex";
+        document.getElementById("celebrationSound").play();
+      }
+     
+    }
+  </script>
+</body>
+</html>
