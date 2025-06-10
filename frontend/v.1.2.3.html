@@ -206,7 +206,7 @@
     async function checkPassword() {
       const pw = document.getElementById("password").value;
 
-      const response = await fetch("http://192.168.189.128:5000/analyze", {
+      const response = await fetch("http://192.x.x.x:5000/analyze", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
