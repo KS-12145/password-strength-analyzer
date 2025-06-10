@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Password Strength Analyzer - Kaniz Sukayna</title>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Password Strength Analyzer</h1>
+    <div class="subheading">Kaniz Sukayna // Terminal Mode</div>
+
+    <div class="password-wrapper">
+      <input type="password" id="password" placeholder="Enter your password" />
+      <span class="toggle-password" onclick="togglePassword()">👁️</span>
+    </div>
+
+    <button onclick="checkPassword()">Analyze Password</button>
+
+    <div class="result">
+      <div id="result" class="strength"></div>
+      <ul id="suggestions"></ul>
+    </div>
+  </div>
+
+  <div class="modal" id="popupModal">
+    <div class="modal-content">
+      <h2>ACCESS GRANTED</h2>
+      <p>Your password is hacker-grade 💀</p>
+      <button onclick="closeModal()">Close</button>
+    </div>
+  </div>
+
+  <audio id="celebrationSound" src="https://www.soundjay.com/human/sounds/applause-01.mp3"></audio>
+
+  <script src="script.js"></script>
+</body>
+</html>
